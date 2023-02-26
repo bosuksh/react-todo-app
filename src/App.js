@@ -7,6 +7,7 @@ import TodoInsert from "./components/TodoInsert";
 
 let nextId = 4;
 const App = () => {
+  const [selectedTodo, setSelectedTodo] = useState(null);
   const [insertToggle, setInsertTogggle] = useState(false);
   const [todos, setTodos] = useState([
     {
@@ -27,6 +28,9 @@ const App = () => {
   ]);
 
   const onInsertToggle = () => {
+    if(selectedTodo) {
+      setSelectedTodo(null)
+    }
     setInsertTogggle(prev => !prev)
   }
   const onInsertTodo = (text) => {
@@ -42,6 +46,20 @@ const App = () => {
       nextId++;
     }
   }
+  const onChangeSelectedTodo = (todo) => {
+    setSelectedTodo(todo);
+  }
+  const onRemove = id => {
+    onInsertToggle();
+    setTodos(todos => todos.filter(todo => todo.id !== id));
+  }
+
+  const onUpdate = (id,text) => {
+    onInsertToggle();
+    setTodos(todos => (todos.map(
+        (todo => todo.id === id ? {...todo, text: text} : todo)
+    )));
+  }
   const onCheckToggle = (id) => {
     setTodos(todos =>
         todos.map(todo =>
@@ -51,11 +69,11 @@ const App = () => {
   }
   return(
       <Template todoLength={todos.length}>
-        <TodoList todos={todos} onCheckToggle = {onCheckToggle}></TodoList>
+        <TodoList todos={todos} onCheckToggle = {onCheckToggle} onInertToggle = {onInsertToggle} onChangeSelectedTodo = {onChangeSelectedTodo}></TodoList>
         <div className="add-todo-button" onClick = {onInsertToggle}>
           <MdAddCircle/>
         </div>
-        {insertToggle && <TodoInsert onInsertToggle = {onInsertToggle} onInsertTodo = {onInsertTodo} />}
+        {insertToggle && <TodoInsert onInsertToggle = {onInsertToggle} onInsertTodo = {onInsertTodo} selectedTodo = {selectedTodo} onRemove = {onRemove} onUpdate = {onUpdate}/>}
       </Template>
   )
 }
